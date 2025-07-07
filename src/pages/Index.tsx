@@ -20,6 +20,7 @@ import { Header } from "@/components/Header";
 import { Sidebar } from "@/components/Sidebar";
 import { StatsCard } from "@/components/StatsCard";
 import { TransactionForm } from "@/components/TransactionForm";
+import { POSSystem } from "@/components/POSSystem";
 import { StockManagement } from "@/components/StockManagement";
 import { AIConsultation } from "@/components/AIConsultation";
 import { ReportsView } from "@/components/ReportsView";
@@ -221,7 +222,7 @@ const Dashboard = () => {
               </>
             )}
 
-            {activeTab === "transactions" && <TransactionForm />}
+            {activeTab === "transactions" && <POSSystem />}
             {activeTab === "stock" && <StockManagement />}
             {activeTab === "ai-consultation" && <AIConsultation />}
             {activeTab === "reports" && <ReportsView />}
