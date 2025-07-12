@@ -18,16 +18,67 @@ export const StockManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const stockData = [
-    { id: 1, name: "Paracetamol 500mg", sku: "PCM001", stock: 150, minStock: 50, price: 7500, status: "normal" },
-    { id: 2, name: "Amoxicillin 250mg", sku: "AMX001", stock: 25, minStock: 30, price: 2500, status: "low" },
-    { id: 3, name: "Vitamin C 1000mg", sku: "VTC001", stock: 80, minStock: 40, price: 25000, status: "normal" },
-    { id: 4, name: "Ibuprofen 400mg", sku: "IBU001", stock: 5, minStock: 20, price: 12000, status: "critical" },
-    { id: 5, name: "Cetirizine 10mg", sku: "CTZ001", stock: 45, minStock: 25, price: 8000, status: "normal" },
+    { 
+      id: 1, 
+      name: "Paracetamol 500mg", 
+      sku: "PCM001", 
+      stock: 150, 
+      minStock: 50, 
+      price: 7500, 
+      status: "normal",
+      expiryDate: "2025-12-15",
+      batchNumber: "BCH001-2024"
+    },
+    { 
+      id: 2, 
+      name: "Amoxicillin 250mg", 
+      sku: "AMX001", 
+      stock: 25, 
+      minStock: 30, 
+      price: 2500, 
+      status: "low",
+      expiryDate: "2025-08-20",
+      batchNumber: "BCH002-2024"
+    },
+    { 
+      id: 3, 
+      name: "Vitamin C 1000mg", 
+      sku: "VTC001", 
+      stock: 80, 
+      minStock: 40, 
+      price: 25000, 
+      status: "normal",
+      expiryDate: "2026-03-10",
+      batchNumber: "BCH003-2024"
+    },
+    { 
+      id: 4, 
+      name: "Ibuprofen 400mg", 
+      sku: "IBU001", 
+      stock: 5, 
+      minStock: 20, 
+      price: 12000, 
+      status: "critical",
+      expiryDate: "2025-06-30",
+      batchNumber: "BCH004-2024"
+    },
+    { 
+      id: 5, 
+      name: "Cetirizine 10mg", 
+      sku: "CTZ001", 
+      stock: 45, 
+      minStock: 25, 
+      price: 8000, 
+      status: "normal",
+      expiryDate: "2025-11-25",
+      batchNumber: "BCH005-2024"
+    },
   ];
 
   const filteredStock = stockData.filter(item =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.sku.toLowerCase().includes(searchTerm.toLowerCase())
+    item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.batchNumber.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusBadge = (status: string, stock: number) => {
@@ -39,6 +90,23 @@ export const StockManagement = () => {
       default:
         return <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">Normal</Badge>;
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
+
+  const isExpiringSoon = (expiryDate: string) => {
+    const today = new Date();
+    const expiry = new Date(expiryDate);
+    const diffTime = expiry.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays <= 90; // Consider expiring if within 90 days
   };
 
   return (
@@ -107,8 +175,8 @@ export const StockManagement = () => {
                 <AlertTriangle className="w-5 h-5 text-red-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Stok Kritis</p>
-                <p className="text-xl font-bold">{stockData.filter(item => item.status === 'critical').length}</p>
+                <p className="text-sm text-gray-600">Akan Kadaluarsa</p>
+                <p className="text-xl font-bold">{stockData.filter(item => isExpiringSoon(item.expiryDate)).length}</p>
               </div>
             </div>
           </CardContent>
@@ -126,7 +194,7 @@ export const StockManagement = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Cari produk atau SKU..."
+                placeholder="Cari produk, SKU, atau nomor batch..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -140,8 +208,10 @@ export const StockManagement = () => {
                 <TableRow className="bg-gray-50">
                   <TableHead>Produk</TableHead>
                   <TableHead>SKU</TableHead>
+                  <TableHead>No. Batch</TableHead>
                   <TableHead>Stok</TableHead>
                   <TableHead>Min. Stok</TableHead>
+                  <TableHead>Tanggal Kadaluarsa</TableHead>
                   <TableHead>Harga</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Aksi</TableHead>
@@ -152,6 +222,7 @@ export const StockManagement = () => {
                   <TableRow key={item.id} className="hover:bg-gray-50/50">
                     <TableCell className="font-medium">{item.name}</TableCell>
                     <TableCell className="text-gray-600">{item.sku}</TableCell>
+                    <TableCell className="text-gray-600 font-mono text-sm">{item.batchNumber}</TableCell>
                     <TableCell>
                       <span className={`font-medium ${
                         item.status === 'critical' ? 'text-red-600' : 
@@ -161,6 +232,18 @@ export const StockManagement = () => {
                       </span>
                     </TableCell>
                     <TableCell className="text-gray-600">{item.minStock}</TableCell>
+                    <TableCell>
+                      <span className={`text-sm ${
+                        isExpiringSoon(item.expiryDate) ? 'text-orange-600 font-medium' : 'text-gray-600'
+                      }`}>
+                        {formatDate(item.expiryDate)}
+                      </span>
+                      {isExpiringSoon(item.expiryDate) && (
+                        <Badge variant="outline" className="ml-2 bg-orange-100 text-orange-700 border-orange-300 text-xs">
+                          Segera Kadaluarsa
+                        </Badge>
+                      )}
+                    </TableCell>
                     <TableCell>Rp {item.price.toLocaleString()}</TableCell>
                     <TableCell>{getStatusBadge(item.status, item.stock)}</TableCell>
                     <TableCell>
