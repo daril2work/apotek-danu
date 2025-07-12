@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,6 +20,7 @@ import { POSSystem } from "@/components/POSSystem";
 import { StockManagement } from "@/components/StockManagement";
 import { AIConsultation } from "@/components/AIConsultation";
 import { ReportsView } from "@/components/ReportsView";
+import { BranchManagement } from "@/components/BranchManagement";
 import { UserProvider } from "@/contexts/UserContext";
 
 const Dashboard = () => {
@@ -211,6 +211,7 @@ const Dashboard = () => {
               </div>
             )}
 
+            {activeTab === "branches" && <BranchManagement />}
             {activeTab === "transactions" && <POSSystem />}
             {activeTab === "stock" && <StockManagement />}
             {activeTab === "ai-consultation" && <AIConsultation />}
