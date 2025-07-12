@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Table,
   TableBody,
@@ -12,12 +12,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Package, Search, AlertTriangle, Plus, Edit, Eye } from "lucide-react";
+import { Package, Search, AlertTriangle, Plus, Edit, Eye, PackagePlus } from "lucide-react";
+import { StockReceiving } from "./StockReceiving";
 
 export const StockManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const stockData = [
+  const [stockData, setStockData] = useState([
     { 
       id: 1, 
       name: "Paracetamol 500mg", 
@@ -73,7 +74,31 @@ export const StockManagement = () => {
       expiryDate: "2025-11-25",
       batchNumber: "BCH005-2024"
     },
-  ];
+  ]);
+
+  const handleStockUpdate = (productId: string, addedQuantity: number) => {
+    setStockData(prevData => 
+      prevData.map(item => {
+        if (item.id.toString() === productId) {
+          const newStock = item.stock + addedQuantity;
+          let newStatus = "normal";
+          
+          if (newStock <= item.minStock * 0.5) {
+            newStatus = "critical";
+          } else if (newStock <= item.minStock) {
+            newStatus = "low";
+          }
+          
+          return {
+            ...item,
+            stock: newStock,
+            status: newStatus
+          };
+        }
+        return item;
+      })
+    );
+  };
 
   const filteredStock = stockData.filter(item =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -124,145 +149,164 @@ export const StockManagement = () => {
         </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <Package className="w-5 h-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Total Produk</p>
-                <p className="text-xl font-bold">{stockData.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <Tabs defaultValue="stock-list" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2 bg-gray-100">
+          <TabsTrigger value="stock-list" className="flex items-center gap-2">
+            <Package className="w-4 h-4" />
+            Daftar Stok
+          </TabsTrigger>
+          <TabsTrigger value="receiving" className="flex items-center gap-2">
+            <PackagePlus className="w-4 h-4" />
+            Penerimaan Barang
+          </TabsTrigger>
+        </TabsList>
 
-        <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Package className="w-5 h-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Stok Normal</p>
-                <p className="text-xl font-bold">{stockData.filter(item => item.status === 'normal').length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <TabsContent value="stock-list" className="space-y-6">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <Package className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Total Produk</p>
+                    <p className="text-xl font-bold">{stockData.length}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Stok Rendah</p>
-                <p className="text-xl font-bold">{stockData.filter(item => item.status === 'low').length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Package className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Stok Normal</p>
+                    <p className="text-xl font-bold">{stockData.filter(item => item.status === 'normal').length}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Akan Kadaluarsa</p>
-                <p className="text-xl font-bold">{stockData.filter(item => isExpiringSoon(item.expiryDate)).length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <AlertTriangle className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Stok Rendah</p>
+                    <p className="text-xl font-bold">{stockData.filter(item => item.status === 'low').length}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-      {/* Search and Filter */}
-      <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">
-        <CardHeader>
-          <CardTitle>Daftar Stok Produk</CardTitle>
-          <CardDescription>Monitoring stok obat di cabang ini</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Cari produk, SKU, atau nomor batch..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+            <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                    <AlertTriangle className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Akan Kadaluarsa</p>
+                    <p className="text-xl font-bold">{stockData.filter(item => isExpiringSoon(item.expiryDate)).length}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          <div className="rounded-lg border overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-gray-50">
-                  <TableHead>Produk</TableHead>
-                  <TableHead>SKU</TableHead>
-                  <TableHead>No. Batch</TableHead>
-                  <TableHead>Stok</TableHead>
-                  <TableHead>Min. Stok</TableHead>
-                  <TableHead>Tanggal Kadaluarsa</TableHead>
-                  <TableHead>Harga</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Aksi</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredStock.map((item) => (
-                  <TableRow key={item.id} className="hover:bg-gray-50/50">
-                    <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell className="text-gray-600">{item.sku}</TableCell>
-                    <TableCell className="text-gray-600 font-mono text-sm">{item.batchNumber}</TableCell>
-                    <TableCell>
-                      <span className={`font-medium ${
-                        item.status === 'critical' ? 'text-red-600' : 
-                        item.status === 'low' ? 'text-orange-600' : 'text-green-600'
-                      }`}>
-                        {item.stock}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-gray-600">{item.minStock}</TableCell>
-                    <TableCell>
-                      <span className={`text-sm ${
-                        isExpiringSoon(item.expiryDate) ? 'text-orange-600 font-medium' : 'text-gray-600'
-                      }`}>
-                        {formatDate(item.expiryDate)}
-                      </span>
-                      {isExpiringSoon(item.expiryDate) && (
-                        <Badge variant="outline" className="ml-2 bg-orange-100 text-orange-700 border-orange-300 text-xs">
-                          Segera Kadaluarsa
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>Rp {item.price.toLocaleString()}</TableCell>
-                    <TableCell>{getStatusBadge(item.status, item.stock)}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+          {/* Search and Filter */}
+          <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">
+            <CardHeader>
+              <CardTitle>Daftar Stok Produk</CardTitle>
+              <CardDescription>Monitoring stok obat di cabang ini</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-4 mb-6">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Cari produk, SKU, atau nomor batch..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-lg border overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-gray-50">
+                      <TableHead>Produk</TableHead>
+                      <TableHead>SKU</TableHead>
+                      <TableHead>No. Batch</TableHead>
+                      <TableHead>Stok</TableHead>
+                      <TableHead>Min. Stok</TableHead>
+                      <TableHead>Tanggal Kadaluarsa</TableHead>
+                      <TableHead>Harga</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Aksi</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredStock.map((item) => (
+                      <TableRow key={item.id} className="hover:bg-gray-50/50">
+                        <TableCell className="font-medium">{item.name}</TableCell>
+                        <TableCell className="text-gray-600">{item.sku}</TableCell>
+                        <TableCell className="text-gray-600 font-mono text-sm">{item.batchNumber}</TableCell>
+                        <TableCell>
+                          <span className={`font-medium ${
+                            item.status === 'critical' ? 'text-red-600' : 
+                            item.status === 'low' ? 'text-orange-600' : 'text-green-600'
+                          }`}>
+                            {item.stock}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-gray-600">{item.minStock}</TableCell>
+                        <TableCell>
+                          <span className={`text-sm ${
+                            isExpiringSoon(item.expiryDate) ? 'text-orange-600 font-medium' : 'text-gray-600'
+                          }`}>
+                            {formatDate(item.expiryDate)}
+                          </span>
+                          {isExpiringSoon(item.expiryDate) && (
+                            <Badge variant="outline" className="ml-2 bg-orange-100 text-orange-700 border-orange-300 text-xs">
+                              Segera Kadaluarsa
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>Rp {item.price.toLocaleString()}</TableCell>
+                        <TableCell>{getStatusBadge(item.status, item.stock)}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm">
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button variant="outline" size="sm">
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="receiving">
+          <StockReceiving onStockUpdate={handleStockUpdate} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
