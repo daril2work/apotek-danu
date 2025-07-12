@@ -11,9 +11,7 @@ import {
   Settings,
   Users,
   Building2,
-  ChevronRight,
-  Target,
-  AlertTriangle
+  ChevronRight
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 
@@ -24,7 +22,9 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ isOpen, activeTab, onTabChange }: SidebarProps) => {
-  const { isOwner, isBranchUser } = useUser();
+  const { isOwner } = useUser();
+  const currentPath = window.location.pathname;
+  const isBranchRoute = currentPath.startsWith('/cabang');
 
   // Owner menu items
   const ownerMenuItems = [
@@ -78,37 +78,19 @@ export const Sidebar = ({ isOpen, activeTab, onTabChange }: SidebarProps) => {
     }
   ];
 
-  // Branch user menu items (staff/admin)
+  // Branch user menu items (simplified)
   const branchMenuItems = [
-    {
-      id: "dashboard",
-      label: "Dashboard",
-      icon: LayoutDashboard,
-      badge: null
-    },
     {
       id: "transactions",
       label: "Transaksi",
       icon: ShoppingCart,
-      badge: "3"
+      badge: null
     },
     {
       id: "stock",
       label: "Kelola Stok",
       icon: Package,
       badge: null
-    },
-    {
-      id: "stock-alert",
-      label: "Peringatan Stok",
-      icon: AlertTriangle,
-      badge: "5"
-    },
-    {
-      id: "daily-target",
-      label: "Target Harian",
-      icon: Target,
-      badge: "83%"
     },
     {
       id: "ai-consultation",
@@ -121,16 +103,10 @@ export const Sidebar = ({ isOpen, activeTab, onTabChange }: SidebarProps) => {
       label: "Laporan Harian",
       icon: BarChart3,
       badge: null
-    },
-    {
-      id: "settings",
-      label: "Pengaturan",
-      icon: Settings,
-      badge: null
     }
   ];
 
-  const menuItems = isOwner ? ownerMenuItems : branchMenuItems;
+  const menuItems = (isOwner && !isBranchRoute) ? ownerMenuItems : branchMenuItems;
 
   return (
     <aside className={cn(
@@ -143,7 +119,7 @@ export const Sidebar = ({ isOpen, activeTab, onTabChange }: SidebarProps) => {
           <div className="mb-4 p-2 rounded-lg bg-gradient-to-r from-green-50 to-blue-50 border border-green-200">
             <p className="text-xs font-medium text-gray-600">Mode</p>
             <p className="text-sm font-bold text-green-700 capitalize">
-              {isOwner ? 'Owner Dashboard' : 'Staff Cabang'}
+              {(isOwner && !isBranchRoute) ? 'Owner Dashboard' : 'Staff Cabang'}
             </p>
           </div>
         )}
@@ -181,9 +157,7 @@ export const Sidebar = ({ isOpen, activeTab, onTabChange }: SidebarProps) => {
                             ? "bg-white/20 text-white border-white/30" 
                             : item.badge === "NEW" 
                               ? "bg-orange-100 text-orange-700 border-orange-300"
-                              : item.badge.includes("%")
-                                ? "bg-green-100 text-green-700 border-green-300"
-                                : "bg-blue-100 text-blue-700 border-blue-300"
+                              : "bg-blue-100 text-blue-700 border-blue-300"
                         )}
                       >
                         {item.badge}

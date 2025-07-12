@@ -22,15 +22,25 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  // Mock user data - in real app this would come from authentication
-  const [user, setUser] = useState<User>({
-    id: '1',
-    name: 'Staff Apotek',
-    email: 'staff@apotek.com',
-    role: 'staff', // Change this to 'owner' to see owner view
-    branchId: 'branch-1',
-    branchName: 'Cabang Utama'
-  });
+  // Determine user type based on current route
+  const currentPath = window.location.pathname;
+  const isBranchRoute = currentPath.startsWith('/cabang');
+  
+  const [user, setUser] = useState<User>(
+    isBranchRoute ? {
+      id: '2',
+      name: 'Staff Cabang',
+      email: 'staff@cabang.com',
+      role: 'staff',
+      branchId: 'branch-1',
+      branchName: 'Cabang Utama'
+    } : {
+      id: '1',
+      name: 'Owner Apotek',
+      email: 'owner@apotek.com',
+      role: 'owner'
+    }
+  );
 
   const isOwner = user?.role === 'owner';
   const isBranchUser = user?.role === 'admin' || user?.role === 'staff';
