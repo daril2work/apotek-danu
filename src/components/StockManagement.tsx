@@ -12,8 +12,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Package, Search, AlertTriangle, Plus, Edit, Eye, PackagePlus } from "lucide-react";
+import { Package, Search, AlertTriangle, Plus, Edit, Eye, PackagePlus, Building2 } from "lucide-react";
 import { StockReceiving } from "./StockReceiving";
+import { SupplierManagement } from "./SupplierManagement";
 
 export const StockManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -150,7 +151,7 @@ export const StockManagement = () => {
       </div>
 
       <Tabs defaultValue="stock-list" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 bg-gray-100">
+        <TabsList className="grid w-full grid-cols-3 bg-gray-100">
           <TabsTrigger value="stock-list" className="flex items-center gap-2">
             <Package className="w-4 h-4" />
             Daftar Stok
@@ -158,6 +159,10 @@ export const StockManagement = () => {
           <TabsTrigger value="receiving" className="flex items-center gap-2">
             <PackagePlus className="w-4 h-4" />
             Penerimaan Barang
+          </TabsTrigger>
+          <TabsTrigger value="suppliers" className="flex items-center gap-2">
+            <Building2 className="w-4 h-4" />
+            Kelola Supplier
           </TabsTrigger>
         </TabsList>
 
@@ -305,6 +310,10 @@ export const StockManagement = () => {
 
         <TabsContent value="receiving">
           <StockReceiving onStockUpdate={handleStockUpdate} />
+        </TabsContent>
+
+        <TabsContent value="suppliers">
+          <SupplierManagement />
         </TabsContent>
       </Tabs>
     </div>
