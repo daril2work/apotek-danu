@@ -29,40 +29,40 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
 
   return (
     <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
-      <div className="flex items-center justify-between px-6 py-4">
-        <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between px-4 md:px-6 py-4">
+        <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
           <Button 
             variant="ghost" 
             size="icon"
             onClick={onMenuClick}
-            className="hover:bg-gray-100"
+            className="hover:bg-gray-100 shrink-0"
           >
             <Menu className="w-5 h-5" />
           </Button>
           
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
+            <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center shrink-0">
               <span className="text-white font-bold text-sm">A+</span>
             </div>
-            <div>
-              <h1 className="font-bold text-lg bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+            <div className="min-w-0">
+              <h1 className="font-bold text-sm md:text-lg bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent truncate">
                 Apotek Mini POS
               </h1>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 hidden sm:block">
                 {isOwner ? 'Dashboard Owner' : 'Sistem POS Cabang'}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           {/* Branch Selector - Only for Owner */}
           {isOwner && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2 hidden sm:flex">
                   <Building2 className="w-4 h-4" />
-                  <span>Semua Cabang</span>
+                  <span className="hidden md:inline">Semua Cabang</span>
                   <ChevronDown className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -87,9 +87,9 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
 
           {/* Branch Name - Only for Branch Users */}
           {!isOwner && user?.branchName && (
-            <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-300">
+            <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-300 hidden sm:flex">
               <Building2 className="w-4 h-4 mr-1" />
-              {user.branchName}
+              <span className="hidden md:inline">{user.branchName}</span>
             </Badge>
           )}
 
@@ -111,11 +111,11 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
                     {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
                   </AvatarFallback>
                 </Avatar>
-                <div className="text-left">
+                <div className="text-left hidden md:block">
                   <p className="text-sm font-medium">{user?.name || 'User'}</p>
                   <p className="text-xs text-gray-500 capitalize">{user?.role || 'staff'}</p>
                 </div>
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-4 h-4 hidden sm:block" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
