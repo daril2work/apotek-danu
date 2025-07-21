@@ -12,9 +12,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Package, Search, AlertTriangle, Plus, Edit, Eye, PackagePlus, Building2 } from "lucide-react";
+import { Package, Search, AlertTriangle, Plus, Edit, Eye, PackagePlus, Building2, Upload } from "lucide-react";
 import { StockReceiving } from "./StockReceiving";
 import { SupplierManagement } from "./SupplierManagement";
+import { ImportMasterData } from "./ImportMasterData";
 
 export const StockManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -101,6 +102,10 @@ export const StockManagement = () => {
     );
   };
 
+  const handleDataImport = (importedData: any[]) => {
+    setStockData(prevData => [...prevData, ...importedData]);
+  };
+
   const filteredStock = stockData.filter(item =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -151,7 +156,7 @@ export const StockManagement = () => {
       </div>
 
       <Tabs defaultValue="stock-list" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 bg-gray-100">
+        <TabsList className="grid w-full grid-cols-4 bg-gray-100">
           <TabsTrigger value="stock-list" className="flex items-center gap-2">
             <Package className="w-4 h-4" />
             Daftar Stok
@@ -163,6 +168,10 @@ export const StockManagement = () => {
           <TabsTrigger value="suppliers" className="flex items-center gap-2">
             <Building2 className="w-4 h-4" />
             Kelola Supplier
+          </TabsTrigger>
+          <TabsTrigger value="import" className="flex items-center gap-2">
+            <Upload className="w-4 h-4" />
+            Import Data
           </TabsTrigger>
         </TabsList>
 
@@ -314,6 +323,10 @@ export const StockManagement = () => {
 
         <TabsContent value="suppliers">
           <SupplierManagement />
+        </TabsContent>
+
+        <TabsContent value="import">
+          <ImportMasterData onDataImport={handleDataImport} />
         </TabsContent>
       </Tabs>
     </div>
